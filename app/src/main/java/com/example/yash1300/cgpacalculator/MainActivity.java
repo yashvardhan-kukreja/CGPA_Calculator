@@ -1,5 +1,6 @@
 package com.example.yash1300.cgpacalculator;
 
+import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -7,14 +8,20 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
+
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
     EditText cred1, cred2, cred3, cred4, cred5;
     Spinner grade1, grade2, grade3, grade4, grade5;
     int cont1, cont2, cont3, cont4, cont5;
     Button cal;
+    TextToSpeech textToSpeech;
+    Integer sound_flag = 1;
+    ImageView sound;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
         cred3 = findViewById(R.id.creds3);
         cred4 = findViewById(R.id.creds4);
         cred5 = findViewById(R.id.creds5);
+        sound = findViewById(R.id.sound);
 
         grade1 = findViewById(R.id.sub1);
         grade2 = findViewById(R.id.sub2);
@@ -34,6 +42,31 @@ public class MainActivity extends AppCompatActivity {
         grade5 = findViewById(R.id.sub5);
 
         cal = findViewById(R.id.calCGPA);
+        sound.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (sound_flag == 1){
+                    sound_flag = 0;
+                    sound.setImageResource(R.drawable.mute);
+                }
+                else{
+                    sound_flag = 1;
+                    sound.setImageResource(R.drawable.unmute);
+                }
+            }
+        });
+        textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int i) {
+                if ( i!= TextToSpeech.ERROR){
+                    textToSpeech.setLanguage(Locale.getDefault());
+
+                }
+                else{
+                    Toast.makeText(MainActivity.this,"error",Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
 
         final String[] grades1 = {"   #   ", "   S   ", "   A   ", "   B   ", "   C   ", "   D   ", "   E   ", "   N   "};
         final String[] grades = {"#", "S", "A", "B", "C", "D", "E", "N"};
@@ -179,6 +212,9 @@ public class MainActivity extends AppCompatActivity {
                         + (Integer.parseInt(cred5.getText().toString())*cont5));
                 double cgpa = numerator/(Integer.parseInt(cred1.getText().toString()) + Integer.parseInt(cred2.getText().toString()) + Integer.parseInt(cred3.getText().toString()) + Integer.parseInt(cred4.getText().toString()) + Integer.parseInt(cred5.getText().toString()));
                 Toast.makeText(MainActivity.this, Double.toString(cgpa), Toast.LENGTH_LONG).show();
+                if (sound_flag == 1){
+                    textToSpeech.speak(String.valueOf(cgpa),TextToSpeech.QUEUE_FLUSH,null);
+                                    }
             }
         });
 
